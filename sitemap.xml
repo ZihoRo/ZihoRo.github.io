@@ -1,0 +1,74 @@
+<?xml-stylesheet type="text/xsl" href="https://ZihoRo.github.io/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://ZihoRo.github.io/categories/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/categories/java/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/tags/java/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/tags/jit/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/post/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/tags/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/post/laboratory-multithreading-and-jit/</loc>
+    <lastmod>2019-12-17T18:34:59+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/tags/gc-roots/</loc>
+    <lastmod>2019-12-17T18:34:41+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ZihoRo.github.io/post/laboratory-gc-roots-thread-pool/</loc>
+    <lastmod>2019-12-17T18:34:41+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+</urlset>

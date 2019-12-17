@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>实验室之多线程： JIT 干扰 - Ziho Ro&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Ziho Ro" /><meta name="description" content="问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
+
+
+<link rel="canonical" href="https://ZihoRo.github.io/post/laboratory-multithreading-and-jit/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="实验室之多线程： JIT 干扰" />
+<meta property="og:description" content="问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ZihoRo.github.io/post/laboratory-multithreading-and-jit/" />
+<meta property="article:published_time" content="2019-12-17T18:34:59+08:00" />
+<meta property="article:modified_time" content="2019-12-17T18:34:59+08:00" />
+<meta itemprop="name" content="实验室之多线程： JIT 干扰">
+<meta itemprop="description" content="问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread">
+
+
+<meta itemprop="datePublished" content="2019-12-17T18:34:59&#43;08:00" />
+<meta itemprop="dateModified" content="2019-12-17T18:34:59&#43;08:00" />
+<meta itemprop="wordCount" content="782">
+
+
+
+<meta itemprop="keywords" content="JAVA,JIT," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="实验室之多线程： JIT 干扰"/>
+<meta name="twitter:description" content="问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Ziho Ro&#39;s Blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">类别</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Ziho Ro&#39;s Blog</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">类别</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">实验室之多线程： JIT 干扰</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-12-17 </span>
+        <div class="post-category">
+            <a href="/categories/java/"> JAVA </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    
+  </div>
+</div>
+    <div class="post-content">
+      <div class="sect1">
+<h2 id="_问题多线程情况下对非_volatile_的共享变量的改动其他线程是否可见">问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>第一轮测试</p>
+<div class="ulist">
+<ul>
+<li>
+<p>测试代码</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class MultiThreadJitTest {
+    private static boolean flag = false;
+    private static long num = 0;
+    public static void main(String[] args) throws InterruptedException {
+        long now = System.currentTimeMillis();
+        final Thread thread1 = new Thread(() -&gt; {
+            System.out.printf("%s, %s start.%n", Thread.currentThread().getName(), flag);
+            while (!flag) {
+
+            }
+            System.out.printf("%s, %s exit.%n", Thread.currentThread().getName(), flag);
+        });
+        thread1.start();
+        for (long i = 0;i &lt; (now&gt;&gt;&gt;11);i++) {
+            num+=i;
+        }
+        flag = true;
+        thread1.join();
+        System.out.printf("%s, exit", num);
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>运行结果</p>
+<div class="listingblock">
+<div class="content">
+<pre>Thread-0, false start.</pre>
+</div>
+</div>
+</li>
+<li>
+<p>看似好像 Thread-0  好像永远都得不到主线程修改后的 flag，陷入死循环，但是总感觉不太对。（代码中使用循环来达到类似 sleep 的目的，避免其他方法内部可能的对同步代码块或 <code>volatile</code> 的读写）</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>第二轮测试</p>
+<div class="ulist">
+<ul>
+<li>
+<p>测试代码不变，但是加上 <code>JVM</code> 参数 <code>-Xint</code></p>
+</li>
+<li>
+<p>运行结果</p>
+<div class="listingblock">
+<div class="content">
+<pre>Thread-0, false start.
+Thread-0, true exit.
+296305926254099146, exit</pre>
+</div>
+</div>
+</li>
+<li>
+<p>第一轮和第二轮的差别仅仅只有 <code>JVM</code> 参数，这个 <code>JVM</code> 参数的作用是关闭 <code>JIT</code> 编译（关闭之后执行时间有点长）。</p>
+</li>
+<li>
+<p>然后我们瞧瞧 <code>JIT</code> 编译是干啥的</p>
+<div class="ulist">
+<ul>
+<li>
+<p>虚拟机会检测热点代码，触发 <code>JIT</code> 编译，将字节码编译成机器码。</p>
+</li>
+<li>
+<p>热点探测的方式：1、基于采样。2、基于计数器。</p>
+</li>
+<li>
+<p>HotSpot 虚拟机使用计数器的方式检测热点代码。</p>
+</li>
+<li>
+<p>计数器有两种：</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>方法调用计数器，统计方法调用次数，达到阀值会触发 <code>JIT</code> 编译。</p>
+</li>
+<li>
+<p>回边计数器，统计循环体执行次数，达到阀值会触发 <code>JIT</code> 编译。</p>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>基于以上，猜测第一轮循环无法退出，可能是因为循环次数过多，触发 <code>JIT</code> 编译，导致代码被优化。然后基于此次猜测，开始第三轮测试。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>第三轮测试</p>
+<div class="ulist">
+<ul>
+<li>
+<p>测试代码改改</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class MultiThreadJitTest {
+    private static boolean flag = false;
+    private static long num = 0;
+    public static void main(String[] args) throws InterruptedException {
+        long now = System.currentTimeMillis();
+        final Thread thread1 = new Thread(() -&gt; {
+            System.out.printf("%s, %s start.%n", Thread.currentThread().getName(), flag);
+            while (!flag) {
+                for (long i = 0;i &lt; (now&gt;&gt;&gt;10);i++) {
+                    num+=i;
+                }
+            }
+            System.out.printf("%s, %s exit.%n", Thread.currentThread().getName(), flag);
+        });
+        thread1.start();
+        for (long i = 0;i &lt; (now&gt;&gt;&gt;11);i++) {
+            num+=i;
+        }
+        flag = true;
+        thread1.join();
+        System.out.printf("%s, exit", num);
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>运行结果</p>
+<div class="listingblock">
+<div class="content">
+<pre>Thread-0, false start.
+Thread-0, true exit.
+1185877099679409763, exit</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Thread-0  可以得到主线程修改后的 flag，进而退出循环。</p>
+</li>
+<li>
+<p>第二轮测试和第三轮测试的结果相似，代码上仅仅是第三轮测试多了个内层循环（为了防止），导致外层循环的循环次数减少。</p>
+</li>
+<li>
+<p>由此可以得出，第一轮测试的无法退出循环就是 <code>JIT</code> 编译导致。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>结论：多线程情况下，对非 <code>volatile</code> 的共享变量的改动，其他线程是可见的，只不过没有 <code>volatile</code> 的 <code>happens-before</code> 约束，指令可能重排，可见性也可能没那么及时。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_环境">环境</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre>OS version  ： MacOS 10.14.6
+JDK version ： java version "1.8.0_202"
+               Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
+               Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, mixed mode)</pre>
+</div>
+</div>
+</div>
+</div>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">Ziho Ro</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2019-12-17
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/java/">JAVA</a>
+          <a href="/tags/jit/">JIT</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/laboratory-gc-roots-thread-pool/">
+            <span class="next-text nav-default">实验室之 GC Roots：线程池回收</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://ZihoRo.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Ziho Ro</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

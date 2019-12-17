@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>实验室之 GC Roots：线程池回收 - Ziho Ro&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Ziho Ro" /><meta name="description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size =" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
+
+
+<link rel="canonical" href="https://ZihoRo.github.io/post/laboratory-gc-roots-thread-pool/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="实验室之 GC Roots：线程池回收" />
+<meta property="og:description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size =" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ZihoRo.github.io/post/laboratory-gc-roots-thread-pool/" />
+<meta property="article:published_time" content="2019-12-17T18:34:41+08:00" />
+<meta property="article:modified_time" content="2019-12-17T18:34:41+08:00" />
+<meta itemprop="name" content="实验室之 GC Roots：线程池回收">
+<meta itemprop="description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size =">
+
+
+<meta itemprop="datePublished" content="2019-12-17T18:34:41&#43;08:00" />
+<meta itemprop="dateModified" content="2019-12-17T18:34:41&#43;08:00" />
+<meta itemprop="wordCount" content="1628">
+
+
+
+<meta itemprop="keywords" content="JAVA,GC Roots," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="实验室之 GC Roots：线程池回收"/>
+<meta name="twitter:description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size ="/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Ziho Ro&#39;s Blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">类别</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Ziho Ro&#39;s Blog</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">类别</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">实验室之 GC Roots：线程池回收</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-12-17 </span>
+        <div class="post-category">
+            <a href="/categories/java/"> JAVA </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    
+  </div>
+</div>
+    <div class="post-content">
+      <div class="sect1">
+<h2 id="_问题一当你创建一个线程池之后往线程池扔一个任务之后不持有该线程池该线程池里的线程是否会被垃圾回收">问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>测试代码</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class ThreadPoolGcTest {
+    public static void main(String[] args) {
+        int size = 10;
+        CountDownLatch countDownLatch = new CountDownLatch(size);
+        for(int i = 0;i &lt; size;i++) {
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
+            final int j = i;
+            executorService.execute(() -&gt; {
+                System.out.println(j);
+                countDownLatch.countDown();
+            });
+        }
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.gc();
+        System.out.println("GC 了");
+        LockSupport.park();
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>运行结果</p>
+<div class="listingblock">
+<div class="content">
+<pre>0
+3
+4
+2
+1
+5
+6
+7
+8
+9
+GC 了</pre>
+</div>
+</div>
+</li>
+<li>
+<p><code>jstack</code> 查看线程（10 个线程都在，此处只取了一个放出来）</p>
+<div class="listingblock">
+<div class="content">
+<pre>"pool-1-thread-1" #10 prio=5 os_prio=31 tid=0x00007ffe3713e800 nid=0x5803 waiting on condition [0x00007000084ed000]
+   java.lang.Thread.State: WAITING (parking)
+	at sun.misc.Unsafe.park(Native Method)
+	- parking to wait for  &lt;0x00000005c0048b78&gt; (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:2039)
+	at java.util.concurrent.LinkedBlockingQueue.take(LinkedBlockingQueue.java:442)
+	at java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1074)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1134)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+
+   Locked ownable synchronizers:
+	- None</pre>
+</div>
+</div>
+</li>
+<li>
+<p>为什么</p>
+<div class="ulist">
+<ul>
+<li>
+<p>线程池执行完一个任务之后，会从任务队列获取一个新的任务继续执行，如果队列里没有新任务且工作线程数量不超过核心线程数时，则会阻塞当前线程（本处不会对线程池的原理作过多讲解）。从 <code>jstack</code> 打印出的堆栈信息里，我们也可以看出线程池获取新任务的方法是 <code>ThreadPoolExecutor.getTask</code>，并在里面调用了 <code>LinkedBlockingQueue.take</code></p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">private Runnable getTask() {
+    boolean timedOut = false; // Did the last poll() time out?
+
+    for (;;) {
+        int c = ctl.get();
+        int rs = runStateOf(c);
+
+        // Check if queue empty only if necessary.
+        if (rs &gt;= SHUTDOWN &amp;&amp; (rs &gt;= STOP || workQueue.isEmpty())) {
+            decrementWorkerCount();
+            return null;
+        }
+
+        int wc = workerCountOf(c);
+
+        // Are workers subject to culling?
+        boolean timed = allowCoreThreadTimeOut || wc &gt; corePoolSize;
+
+        if ((wc &gt; maximumPoolSize || (timed &amp;&amp; timedOut))
+            &amp;&amp; (wc &gt; 1 || workQueue.isEmpty())) {
+            if (compareAndDecrementWorkerCount(c))
+                return null;
+            continue;
+        }
+
+        try {
+            Runnable r = timed ?
+                workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :
+                workQueue.take();
+            if (r != null)
+                return r;
+            timedOut = true;
+        } catch (InterruptedException retry) {
+            timedOut = false;
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>垃圾回收，通过 <code>GC Roots</code> 进行可达性分析来清理不可达对象，而 <code>GC Roots</code> 里恰恰包含了一个已经启动但是还未结束的线程（原文： <code>A started, but not stopped, thread.</code>）。<a href="https://help.eclipse.org/2019-09/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html">MAT Garbage Collection Roots</a></p>
+</li>
+<li>
+<p>由此我们可能得出：当线程池里不超过 <code>corePoolSize</code> 的工作线程是不会被垃圾回收的</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>结论：不会被回收，因为已经启动但是还未结束的线程是 <code>GC Roots</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_问题二线程不会被回收那么线程池是否会被回收">问题二：线程不会被回收，那么线程池是否会被回收？</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>测试代码（此处用到了引用队列和弱引用，暂不作深入讲解）</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public class ThreadPoolGcTest {
+    public static void main(String[] args) {
+        int size = 10;
+        ReferenceQueue&lt;ExecutorService&gt; executorServiceReferenceQueue = new ReferenceQueue&lt;&gt;();
+        List&lt;WeakReference&lt;ExecutorService&gt;&gt; executorServiceList = new ArrayList&lt;&gt;(size);
+        CountDownLatch countDownLatch = new CountDownLatch(size);
+        for(int i = 0;i &lt; size;i++) {
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
+            executorServiceList.add(new WeakReference&lt;&gt;(executorService, executorServiceReferenceQueue));
+            final int j = i;
+            executorService.execute(() -&gt; {
+                System.out.println(j);
+                countDownLatch.countDown();
+            });
+        }
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.gc();
+        System.out.println("GC 了");
+        printResult(executorServiceList, "ExecutorService");
+        LockSupport.park();
+    }
+
+    public static &lt;T&gt; void printResult(List&lt;WeakReference&lt;T&gt;&gt; list, String name) {
+        if(list.stream().allMatch(value -&gt; value.get() == null)) {
+            System.out.printf("%s 全部被回收！%n", name);
+        } else if(list.stream().allMatch(value -&gt; value.get() != null)) {
+            System.out.printf("%s 全部没回收！%n", name);
+        } else {
+            System.out.printf("%s 部分被回收！%n", name);
+        }
+    }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>运行结果</p>
+<div class="listingblock">
+<div class="content">
+<pre>0
+2
+1
+4
+3
+5
+6
+7
+8
+9
+GC 了
+ExecutorService 全部没回收！</pre>
+</div>
+</div>
+</li>
+<li>
+<p>为什么</p>
+<div class="ulist">
+<ul>
+<li>
+<p>我们先看 <code>ThreadPoolExecutor</code> 里工作线程的定义</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">private final class Worker
+        extends AbstractQueuedSynchronizer
+        implements Runnable
+{
+    /**
+     * This class will never be serialized, but we provide a
+     * serialVersionUID to suppress a javac warning.
+     */
+    private static final long serialVersionUID = 6138294804551838833L;
+
+    /** Thread this worker is running in.  Null if factory fails. */
+    final Thread thread;
+    /** Initial task to run.  Possibly null. */
+    Runnable firstTask;
+    /** Per-thread task counter */
+    volatile long completedTasks;
+    /**
+     * Creates with given first task and thread from ThreadFactory.
+     * @param firstTask the first task (null if none)
+     */
+    Worker(Runnable firstTask) {
+        setState(-1); // inhibit interrupts until runWorker
+        this.firstTask = firstTask;
+        this.thread = getThreadFactory().newThread(this);
+    }
+    // 其他方法省略
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p><code>Worker</code> 没有 <code>static</code> 修饰，所以在实例化的时候会持有外部类 <code>ThreadPoolExecutor</code> 的引用。</p>
+</li>
+<li>
+<p><code>Worker</code> 的构造方法里创建线程时会将当前 <code>Worker</code> 的引用传入线程。</p>
+</li>
+<li>
+<p>最终的结构是：实际的工作线程 <code>thread</code> 持有 <code>Worker</code> 的引用，<code>Worker</code> 持有外部类 <code>ThreadPoolExecutor</code> 的引用。</p>
+</li>
+<li>
+<p>而 <code>GC Roots</code> 里包含了当前活动线程引用的对象（原文： <code>Object referred to from a currently active thread block</code>）。<a href="https://help.eclipse.org/2019-09/index.jsp?topic=%2Forg.eclipse.mat.ui.help%2Fconcepts%2Fgcroots.html">MAT Garbage Collection Roots</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>结论：不会被回收，因为线程池被线程间接持有，而活动线程引用的对象属于 <code>GC Roots</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_问题三如果线程池是通过_executors_newsinglethreadexecutor_创建的是否会被垃圾回收">问题三：如果线程池是通过 Executors.newSingleThreadExecutor() 创建的，是否会被垃圾回收？</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>测试代码，只需要改动问题二的线程池创建，此处不贴代码了。</p>
+</li>
+<li>
+<p>运行结果</p>
+<div class="listingblock">
+<div class="content">
+<pre>1
+4
+3
+0
+2
+6
+5
+7
+8
+9
+GC 了
+ExecutorService 全部被回收！</pre>
+</div>
+</div>
+</li>
+<li>
+<p><code>jstack</code> 查看线程堆栈，所有线程已经被回收掉了。</p>
+</li>
+<li>
+<p>为什么</p>
+<div class="ulist">
+<ul>
+<li>
+<p>我们先看问题二和问题三创建线程的不同之处</p>
+<div class="ulist">
+<ul>
+<li>
+<p>问题二的创建线程：</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public static ExecutorService newFixedThreadPool(int nThreads) {
+    return new ThreadPoolExecutor(nThreads, nThreads,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue&lt;Runnable&gt;());
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>问题三的创建线程：</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">public static ExecutorService newSingleThreadExecutor() {
+    return new FinalizableDelegatedExecutorService
+        (new ThreadPoolExecutor(1, 1,
+                                0L, TimeUnit.MILLISECONDS,
+                                new LinkedBlockingQueue&lt;Runnable&gt;()));
+}</code></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>接下来我们看看 <code>FinalizableDelegatedExecutorService</code> 是干什么的。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-java" data-lang="java">static class FinalizableDelegatedExecutorService
+    extends DelegatedExecutorService {
+    FinalizableDelegatedExecutorService(ExecutorService executor) {
+        super(executor);
+    }
+    protected void finalize() {
+        super.shutdown();
+    }
+}
+// 省略了不必要的代码
+static class DelegatedExecutorService extends AbstractExecutorService {
+    private final ExecutorService e;
+    DelegatedExecutorService(ExecutorService executor) { e = executor; }
+    public void shutdown() { e.shutdown(); }
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>FinalizableDelegatedExecutorService</code> 重写了 <code>finalize</code> 方法，该对象被垃圾回收时，JVM 会调用 <code>finalize</code>，而重写的 <code>finalize</code> 方法调用了父类的 <code>shutdown</code>，父类 <code>DelegatedExecutorService</code> 调用的是构造函数传入的 <code>ExecutorService</code> 的 <code>shutdown</code>，所以 <code>FinalizableDelegatedExecutorService</code> 被垃圾回收时，会将实际的线程池 <code>shutdown</code>。</p>
+</li>
+<li>
+<p>所以一切真相大白了， <code>FinalizableDelegatedExecutorService</code> 没有被主线程持有，也没有被线程池里的线程持有，所以会随着执行结束而变成不可达对象，最终被 <code>JVM</code> 回收，然后触发调用 <code>finalize</code> 将线程池关闭。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>结论：会被回收，因为 <code>Executors.newSingleThreadExecutor()</code> 使用的是代理线程池，并且在代理线程池被 <code>JVM</code> 回收时，将实际线程池关闭。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_环境">环境</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre>OS version  ： MacOS 10.14.6
+JDK version ： java version "1.8.0_202"
+               Java(TM) SE Runtime Environment (build 1.8.0_202-b08)
+               Java HotSpot(TM) 64-Bit Server VM (build 25.202-b08, mixed mode)</pre>
+</div>
+</div>
+</div>
+</div>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">Ziho Ro</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2019-12-17
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/java/">JAVA</a>
+          <a href="/tags/gc-roots/">GC Roots</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/laboratory-multithreading-and-jit/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">实验室之多线程： JIT 干扰</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://ZihoRo.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Ziho Ro</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
