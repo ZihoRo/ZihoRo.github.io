@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: https://ZihoRo.github.io/sitemap.xml
+Sitemap: https://zihoro.github.io/sitemap.xml

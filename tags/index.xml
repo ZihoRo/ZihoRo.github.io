@@ -2,39 +2,39 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Ziho Ro&#39;s Blog</title>
-    <link>https://ZihoRo.github.io/tags/</link>
+    <link>https://zihoro.github.io/tags/</link>
     <description>Recent content in Tags on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 17 Dec 2019 18:34:59 +0800</lastBuildDate>
     
-	<atom:link href="https://ZihoRo.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://zihoro.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>JAVA</title>
-      <link>https://ZihoRo.github.io/tags/java/</link>
+      <link>https://zihoro.github.io/tags/java/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
       
-      <guid>https://ZihoRo.github.io/tags/java/</guid>
+      <guid>https://zihoro.github.io/tags/java/</guid>
       <description></description>
     </item>
     
     <item>
       <title>JIT</title>
-      <link>https://ZihoRo.github.io/tags/jit/</link>
+      <link>https://zihoro.github.io/tags/jit/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
       
-      <guid>https://ZihoRo.github.io/tags/jit/</guid>
+      <guid>https://zihoro.github.io/tags/jit/</guid>
       <description></description>
     </item>
     
     <item>
       <title>GC Roots</title>
-      <link>https://ZihoRo.github.io/tags/gc-roots/</link>
+      <link>https://zihoro.github.io/tags/gc-roots/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:41 +0800</pubDate>
       
-      <guid>https://ZihoRo.github.io/tags/gc-roots/</guid>
+      <guid>https://zihoro.github.io/tags/gc-roots/</guid>
       <description></description>
     </item>
     

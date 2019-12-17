@@ -2,30 +2,30 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>JAVA on Ziho Ro&#39;s Blog</title>
-    <link>https://ZihoRo.github.io/categories/java/</link>
+    <link>https://zihoro.github.io/categories/java/</link>
     <description>Recent content in JAVA on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
     <lastBuildDate>Tue, 17 Dec 2019 18:34:59 +0800</lastBuildDate>
     
-	<atom:link href="https://ZihoRo.github.io/categories/java/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://zihoro.github.io/categories/java/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>实验室之多线程： JIT 干扰</title>
-      <link>https://ZihoRo.github.io/post/laboratory-multithreading-and-jit/</link>
+      <link>https://zihoro.github.io/post/laboratory-multithreading-and-jit/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
       
-      <guid>https://ZihoRo.github.io/post/laboratory-multithreading-and-jit/</guid>
+      <guid>https://zihoro.github.io/post/laboratory-multithreading-and-jit/</guid>
       <description>问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread</description>
     </item>
     
     <item>
       <title>实验室之 GC Roots：线程池回收</title>
-      <link>https://ZihoRo.github.io/post/laboratory-gc-roots-thread-pool/</link>
+      <link>https://zihoro.github.io/post/laboratory-gc-roots-thread-pool/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:41 +0800</pubDate>
       
-      <guid>https://ZihoRo.github.io/post/laboratory-gc-roots-thread-pool/</guid>
+      <guid>https://zihoro.github.io/post/laboratory-gc-roots-thread-pool/</guid>
       <description>问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size =</description>
     </item>
     
