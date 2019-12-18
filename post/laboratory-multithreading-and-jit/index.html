@@ -295,18 +295,14 @@ Thread-0, true exit.
 1185877099679409763, exit</pre>
 </div>
 </div>
-<div class="ulist">
-<ul>
-<li>
+<div class="paragraph">
 <p><code>Thread-0</code>  可以得到主线程修改后的 <code>flag</code>，进而退出循环。</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>第二轮测试和第三轮测试的结果相似，代码上仅仅是第三轮测试多了个内层循环，导致外层循环的循环次数减少。</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>由此可以得出，第一轮测试的无法退出循环就是 <code>JIT</code> 编译导致。</p>
-</li>
-</ul>
 </div>
 <div class="paragraph">
 <p><strong>结论：多线程情况下，对非 <code>volatile</code> 的共享变量的改动，其他线程是可见的，只不过没有 <code>volatile</code> 的 <code>happens-before</code> 约束，指令可能重排，可见性也可能没那么及时。所以在本地做多线程实验的时候，要记得还有个 <code>JIT</code> 干扰。</strong></p>
