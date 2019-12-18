@@ -6,22 +6,22 @@
     <description>Recent content on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 17 Dec 2019 21:56:48 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 18 Dec 2019 21:56:48 +0800</lastBuildDate>
     
 	<atom:link href="https://zihoro.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>服务平台之业务分析</title>
+      <title>服务平台之业务分析与数据库结构</title>
       <link>https://zihoro.github.io/post/thinking-service-platform/</link>
-      <pubDate>Tue, 17 Dec 2019 21:56:48 +0800</pubDate>
+      <pubDate>Wed, 18 Dec 2019 21:56:48 +0800</pubDate>
       
       <guid>https://zihoro.github.io/post/thinking-service-platform/</guid>
       <description>前言 毕业以来，一直在公司做企业服务相关的开发，公司的系统从最开始的单订单系统+简单交易系统，到后面的单订单系统+多交易系统，再到后面的多订单</description>
     </item>
     
     <item>
-      <title>实验室之多线程： JIT 干扰</title>
+      <title>实验之多线程： JIT 对共享变量读取的干扰</title>
       <link>https://zihoro.github.io/post/laboratory-multithreading-and-jit/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
       
@@ -30,7 +30,7 @@
     </item>
     
     <item>
-      <title>实验室之 GC Roots：线程池回收</title>
+      <title>实验之 GC Roots：线程以及线程池的垃圾回收</title>
       <link>https://zihoro.github.io/post/laboratory-gc-roots-thread-pool/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:41 +0800</pubDate>
       

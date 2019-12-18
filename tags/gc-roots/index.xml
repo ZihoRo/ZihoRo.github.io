@@ -12,7 +12,7 @@
     
     
     <item>
-      <title>实验室之 GC Roots：线程池回收</title>
+      <title>实验之 GC Roots：线程以及线程池的垃圾回收</title>
       <link>https://zihoro.github.io/post/laboratory-gc-roots-thread-pool/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:41 +0800</pubDate>
       

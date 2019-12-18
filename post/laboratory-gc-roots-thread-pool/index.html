@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>实验室之 GC Roots：线程池回收 - Ziho Ro&#39;s Blog</title>
+  <title>实验之 GC Roots：线程以及线程池的垃圾回收 - Ziho Ro&#39;s Blog</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -38,13 +38,13 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="实验室之 GC Roots：线程池回收" />
+<meta property="og:title" content="实验之 GC Roots：线程以及线程池的垃圾回收" />
 <meta property="og:description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size =" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://zihoro.github.io/post/laboratory-gc-roots-thread-pool/" />
 <meta property="article:published_time" content="2019-12-17T18:34:41+08:00" />
 <meta property="article:modified_time" content="2019-12-17T18:34:41+08:00" />
-<meta itemprop="name" content="实验室之 GC Roots：线程池回收">
+<meta itemprop="name" content="实验之 GC Roots：线程以及线程池的垃圾回收">
 <meta itemprop="description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size =">
 
 
@@ -56,7 +56,7 @@
 
 <meta itemprop="keywords" content="JAVA,GC Roots,实验," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="实验室之 GC Roots：线程池回收"/>
+<meta name="twitter:title" content="实验之 GC Roots：线程以及线程池的垃圾回收"/>
 <meta name="twitter:description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size ="/>
 
 <!--[if lte IE 9]>
@@ -120,7 +120,7 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">实验室之 GC Roots：线程池回收</h1>
+      <h1 class="post-title">实验之 GC Roots：线程以及线程池的垃圾回收</h1>
 
       <div class="post-meta">
         <span class="post-time"> 2019-12-17 </span>
@@ -273,7 +273,7 @@ GC 了</pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>结论：不会被回收，因为已经启动但是还未结束的线程是 <code>GC Roots</code></p>
+<p><strong>结论：不会被回收，因为已经启动但是还未结束的线程是 <code>GC Roots</code></strong></p>
 </div>
 </div>
 </div>
@@ -401,7 +401,7 @@ ExecutorService 全部没回收！</pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>结论：不会被回收，因为线程池被线程间接持有，而活动线程引用的对象属于 <code>GC Roots</code></p>
+<p><strong>结论：不会被回收，因为线程池被线程间接持有，而活动线程引用的对象属于 <code>GC Roots</code></strong></p>
 </div>
 </div>
 </div>
@@ -505,7 +505,7 @@ static class DelegatedExecutorService extends AbstractExecutorService {
 </ul>
 </div>
 <div class="paragraph">
-<p>结论：会被回收，因为 <code>Executors.newSingleThreadExecutor()</code> 使用的是代理线程池，并且在代理线程池被 <code>JVM</code> 回收时，将实际线程池关闭。</p>
+<p><strong>结论：会被回收，因为 <code>Executors.newSingleThreadExecutor()</code> 使用的是代理线程池，并且在代理线程池被 <code>JVM</code> 回收时，将实际线程池关闭。</strong></p>
 </div>
 </div>
 </div>
@@ -549,7 +549,7 @@ JDK version ： java version "1.8.0_202"
       <nav class="post-nav">
         <a class="prev" href="/post/laboratory-multithreading-and-jit/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">实验室之多线程： JIT 干扰</span>
+            <span class="prev-text nav-default">实验之多线程： JIT 对共享变量读取的干扰</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         

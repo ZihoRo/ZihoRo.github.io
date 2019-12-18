@@ -6,15 +6,15 @@
     <description>Recent content in 思路 on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 17 Dec 2019 21:56:48 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 18 Dec 2019 21:56:48 +0800</lastBuildDate>
     
 	<atom:link href="https://zihoro.github.io/categories/%E6%80%9D%E8%B7%AF/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>服务平台之业务分析</title>
+      <title>服务平台之业务分析与数据库结构</title>
       <link>https://zihoro.github.io/post/thinking-service-platform/</link>
-      <pubDate>Tue, 17 Dec 2019 21:56:48 +0800</pubDate>
+      <pubDate>Wed, 18 Dec 2019 21:56:48 +0800</pubDate>
       
       <guid>https://zihoro.github.io/post/thinking-service-platform/</guid>
       <description>前言 毕业以来，一直在公司做企业服务相关的开发，公司的系统从最开始的单订单系统+简单交易系统，到后面的单订单系统+多交易系统，再到后面的多订单</description>
