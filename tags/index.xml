@@ -6,7 +6,7 @@
     <description>Recent content in Tags on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 17 Dec 2019 18:34:59 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 17 Dec 2019 21:56:48 +0800</lastBuildDate>
     
 	<atom:link href="https://zihoro.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,9 +14,18 @@
     <item>
       <title>JAVA</title>
       <link>https://zihoro.github.io/tags/java/</link>
-      <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
+      <pubDate>Tue, 17 Dec 2019 21:56:48 +0800</pubDate>
       
       <guid>https://zihoro.github.io/tags/java/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>思路</title>
+      <link>https://zihoro.github.io/tags/%E6%80%9D%E8%B7%AF/</link>
+      <pubDate>Tue, 17 Dec 2019 21:56:48 +0800</pubDate>
+      
+      <guid>https://zihoro.github.io/tags/%E6%80%9D%E8%B7%AF/</guid>
       <description></description>
     </item>
     
@@ -26,6 +35,15 @@
       <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
       
       <guid>https://zihoro.github.io/tags/jit/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>实验</title>
+      <link>https://zihoro.github.io/tags/%E5%AE%9E%E9%AA%8C/</link>
+      <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
+      
+      <guid>https://zihoro.github.io/tags/%E5%AE%9E%E9%AA%8C/</guid>
       <description></description>
     </item>
     

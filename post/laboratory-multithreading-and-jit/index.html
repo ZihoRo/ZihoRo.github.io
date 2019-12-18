@@ -50,11 +50,11 @@
 
 <meta itemprop="datePublished" content="2019-12-17T18:34:59&#43;08:00" />
 <meta itemprop="dateModified" content="2019-12-17T18:34:59&#43;08:00" />
-<meta itemprop="wordCount" content="782">
+<meta itemprop="wordCount" content="811">
 
 
 
-<meta itemprop="keywords" content="JAVA,JIT," />
+<meta itemprop="keywords" content="JAVA,JIT,实验," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="实验室之多线程： JIT 干扰"/>
 <meta name="twitter:description" content="问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread"/>
@@ -126,6 +126,7 @@
         <span class="post-time"> 2019-12-17 </span>
         <div class="post-category">
             <a href="/categories/java/"> JAVA </a>
+            <a href="/categories/%E5%AE%9E%E9%AA%8C/"> 实验 </a>
             </div>
         
       </div>
@@ -141,14 +142,11 @@
       <div class="sect1">
 <h2 id="_问题多线程情况下对非_volatile_的共享变量的改动其他线程是否可见">问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>第一轮测试</p>
-<div class="ulist">
-<ul>
-<li>
+<div class="sect2">
+<h3 id="_第一轮测试">第一轮测试</h3>
+<div class="paragraph">
 <p>测试代码</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">public class MultiThreadJitTest {
@@ -174,30 +172,26 @@
 }</code></pre>
 </div>
 </div>
-</li>
-<li>
-<p>运行结果</p>
+<div class="paragraph">
+<p>运行结果如下</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>Thread-0, false start.</pre>
 </div>
 </div>
-</li>
-<li>
-<p>看似好像 Thread-0  好像永远都得不到主线程修改后的 flag，陷入死循环，但是总感觉不太对。（代码中使用循环来达到类似 sleep 的目的，避免其他方法内部可能的对同步代码块或 <code>volatile</code> 的读写）</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>看似好像 <code>Thread-0</code> 好像永远都得不到主线程修改后的 <code>flag</code>，陷入死循环，但是总感觉不太对。（代码中使用循环来达到类似 <code>sleep</code> 的目的，避免其他方法内部可能的对同步代码块或 <code>volatile</code> 的读写）</p>
 </div>
-</li>
-<li>
-<p>第二轮测试</p>
-<div class="ulist">
-<ul>
-<li>
+</div>
+<div class="sect2">
+<h3 id="_第二轮测试">第二轮测试</h3>
+<div class="paragraph">
 <p>测试代码不变，但是加上 <code>JVM</code> 参数 <code>-Xint</code></p>
-</li>
-<li>
-<p>运行结果</p>
+</div>
+<div class="paragraph">
+<p>运行结果如下：</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>Thread-0, false start.
@@ -205,10 +199,11 @@ Thread-0, true exit.
 296305926254099146, exit</pre>
 </div>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>第一轮和第二轮的差别仅仅只有 <code>JVM</code> 参数，这个 <code>JVM</code> 参数的作用是关闭 <code>JIT</code> 编译（关闭之后执行时间有点长）。</p>
-</li>
+</div>
+<div class="ulist">
+<ul>
 <li>
 <p>然后我们瞧瞧 <code>JIT</code> 编译是干啥的</p>
 <div class="ulist">
@@ -217,11 +212,25 @@ Thread-0, true exit.
 <p>虚拟机会检测热点代码，触发 <code>JIT</code> 编译，将字节码编译成机器码。</p>
 </li>
 <li>
-<p>热点探测的方式：1、基于采样。2、基于计数器。</p>
+<p>热点探测的方式：</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>基于采样。</p>
 </li>
 <li>
-<p>HotSpot 虚拟机使用计数器的方式检测热点代码。</p>
+<p>基于计数器。</p>
 </li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>HotSpot</code> 虚拟机使用计数器的方式检测热点代码。</p>
+<div class="ulist">
+<ul>
 <li>
 <p>计数器有两种：</p>
 <div class="olist arabic">
@@ -238,18 +247,17 @@ Thread-0, true exit.
 </ul>
 </div>
 </li>
-<li>
-<p>基于以上，猜测第一轮循环无法退出，可能是因为循环次数过多，触发 <code>JIT</code> 编译，导致代码被优化。然后基于此次猜测，开始第三轮测试。</p>
-</li>
 </ul>
 </div>
-</li>
-<li>
-<p>第三轮测试</p>
-<div class="ulist">
-<ul>
-<li>
+<div class="paragraph">
+<p>基于以上，猜测第一轮循环无法退出，可能是因为循环次数过多，触发 <code>JIT</code> 编译，导致代码被优化。然后基于此次猜测，开始第三轮测试。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_第三轮测试">第三轮测试</h3>
+<div class="paragraph">
 <p>测试代码改改</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">public class MultiThreadJitTest {
@@ -277,9 +285,9 @@ Thread-0, true exit.
 }</code></pre>
 </div>
 </div>
-</li>
-<li>
-<p>运行结果</p>
+<div class="paragraph">
+<p>运行结果如下：</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>Thread-0, false start.
@@ -287,9 +295,10 @@ Thread-0, true exit.
 1185877099679409763, exit</pre>
 </div>
 </div>
-</li>
+<div class="ulist">
+<ul>
 <li>
-<p>Thread-0  可以得到主线程修改后的 flag，进而退出循环。</p>
+<p><code>Thread-0</code>  可以得到主线程修改后的 <code>flag</code>，进而退出循环。</p>
 </li>
 <li>
 <p>第二轮测试和第三轮测试的结果相似，代码上仅仅是第三轮测试多了个内层循环（为了防止），导致外层循环的循环次数减少。</p>
@@ -299,11 +308,9 @@ Thread-0, true exit.
 </li>
 </ul>
 </div>
-</li>
-<li>
-<p>结论：多线程情况下，对非 <code>volatile</code> 的共享变量的改动，其他线程是可见的，只不过没有 <code>volatile</code> 的 <code>happens-before</code> 约束，指令可能重排，可见性也可能没那么及时。</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>结论：多线程情况下，对非 <code>volatile</code> 的共享变量的改动，其他线程是可见的，只不过没有 <code>volatile</code> 的 <code>happens-before</code> 约束，指令可能重排，可见性也可能没那么及时。所以在本地做多线程实验的时候，要记得还有个 <code>JIT</code> 干扰。</p>
+</div>
 </div>
 </div>
 </div>
@@ -342,9 +349,14 @@ JDK version ： java version "1.8.0_202"
       <div class="post-tags">
           <a href="/tags/java/">JAVA</a>
           <a href="/tags/jit/">JIT</a>
+          <a href="/tags/%E5%AE%9E%E9%AA%8C/">实验</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/thinking-service-platform/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">服务平台</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/laboratory-gc-roots-thread-pool/">
             <span class="next-text nav-default">实验室之 GC Roots：线程池回收</span>
             <span class="next-text nav-mobile">下一篇</span>

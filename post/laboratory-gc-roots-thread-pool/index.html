@@ -50,11 +50,11 @@
 
 <meta itemprop="datePublished" content="2019-12-17T18:34:41&#43;08:00" />
 <meta itemprop="dateModified" content="2019-12-17T18:34:41&#43;08:00" />
-<meta itemprop="wordCount" content="1628">
+<meta itemprop="wordCount" content="1648">
 
 
 
-<meta itemprop="keywords" content="JAVA,GC Roots," />
+<meta itemprop="keywords" content="JAVA,GC Roots,实验," />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="实验室之 GC Roots：线程池回收"/>
 <meta name="twitter:description" content="问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size ="/>
@@ -126,6 +126,7 @@
         <span class="post-time"> 2019-12-17 </span>
         <div class="post-category">
             <a href="/categories/java/"> JAVA </a>
+            <a href="/categories/%E5%AE%9E%E9%AA%8C/"> 实验 </a>
             </div>
         
       </div>
@@ -141,10 +142,9 @@
       <div class="sect1">
 <h2 id="_问题一当你创建一个线程池之后往线程池扔一个任务之后不持有该线程池该线程池里的线程是否会被垃圾回收">问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
+<div class="paragraph">
 <p>测试代码</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">public class ThreadPoolGcTest {
@@ -176,9 +176,9 @@
 }</code></pre>
 </div>
 </div>
-</li>
-<li>
-<p>运行结果</p>
+<div class="paragraph">
+<p>运行结果如下：</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>0
@@ -194,9 +194,9 @@
 GC 了</pre>
 </div>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p><code>jstack</code> 查看线程（10 个线程都在，此处只取了一个放出来）</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>"pool-1-thread-1" #10 prio=5 os_prio=31 tid=0x00007ffe3713e800 nid=0x5803 waiting on condition [0x00007000084ed000]
@@ -215,9 +215,9 @@ GC 了</pre>
 	- None</pre>
 </div>
 </div>
-</li>
-<li>
-<p>为什么</p>
+<div class="paragraph">
+<p>为什么没有回收？</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -272,21 +272,17 @@ GC 了</pre>
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>结论：不会被回收，因为已经启动但是还未结束的线程是 <code>GC Roots</code></p>
-</li>
-</ul>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_问题二线程不会被回收那么线程池是否会被回收">问题二：线程不会被回收，那么线程池是否会被回收？</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
+<div class="paragraph">
 <p>测试代码（此处用到了引用队列和弱引用，暂不作深入讲解）</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-java" data-lang="java">public class ThreadPoolGcTest {
@@ -332,9 +328,9 @@ GC 了</pre>
 }</code></pre>
 </div>
 </div>
-</li>
-<li>
-<p>运行结果</p>
+<div class="paragraph">
+<p>运行结果如下</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>0
@@ -351,9 +347,9 @@ GC 了
 ExecutorService 全部没回收！</pre>
 </div>
 </div>
-</li>
-<li>
-<p>为什么</p>
+<div class="paragraph">
+<p>为什么没有回收？</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -404,24 +400,20 @@ ExecutorService 全部没回收！</pre>
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>结论：不会被回收，因为线程池被线程间接持有，而活动线程引用的对象属于 <code>GC Roots</code></p>
-</li>
-</ul>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_问题三如果线程池是通过_executors_newsinglethreadexecutor_创建的是否会被垃圾回收">问题三：如果线程池是通过 Executors.newSingleThreadExecutor() 创建的，是否会被垃圾回收？</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
+<div class="paragraph">
 <p>测试代码，只需要改动问题二的线程池创建，此处不贴代码了。</p>
-</li>
-<li>
+</div>
+<div class="paragraph">
 <p>运行结果</p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>1
@@ -438,12 +430,12 @@ GC 了
 ExecutorService 全部被回收！</pre>
 </div>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p><code>jstack</code> 查看线程堆栈，所有线程已经被回收掉了。</p>
-</li>
-<li>
-<p>为什么</p>
+</div>
+<div class="paragraph">
+<p>为什么被回收了？</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
@@ -512,11 +504,8 @@ static class DelegatedExecutorService extends AbstractExecutorService {
 </li>
 </ul>
 </div>
-</li>
-<li>
+<div class="paragraph">
 <p>结论：会被回收，因为 <code>Executors.newSingleThreadExecutor()</code> 使用的是代理线程池，并且在代理线程池被 <code>JVM</code> 回收时，将实际线程池关闭。</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
@@ -555,6 +544,7 @@ JDK version ： java version "1.8.0_202"
       <div class="post-tags">
           <a href="/tags/java/">JAVA</a>
           <a href="/tags/gc-roots/">GC Roots</a>
+          <a href="/tags/%E5%AE%9E%E9%AA%8C/">实验</a>
           </div>
       <nav class="post-nav">
         <a class="prev" href="/post/laboratory-multithreading-and-jit/">

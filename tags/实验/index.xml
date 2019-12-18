@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Ziho Ro&#39;s Blog</title>
-    <link>https://zihoro.github.io/</link>
-    <description>Recent content on Ziho Ro&#39;s Blog</description>
+    <title>实验 on Ziho Ro&#39;s Blog</title>
+    <link>https://zihoro.github.io/tags/%E5%AE%9E%E9%AA%8C/</link>
+    <description>Recent content in 实验 on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Tue, 17 Dec 2019 21:56:48 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 17 Dec 2019 18:34:59 +0800</lastBuildDate>
     
-	<atom:link href="https://zihoro.github.io/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://zihoro.github.io/tags/%E5%AE%9E%E9%AA%8C/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>服务平台</title>
-      <link>https://zihoro.github.io/post/thinking-service-platform/</link>
-      <pubDate>Tue, 17 Dec 2019 21:56:48 +0800</pubDate>
-      
-      <guid>https://zihoro.github.io/post/thinking-service-platform/</guid>
-      <description>前言 毕业以来，一直在公司做企业服务相关的开发，公司的系统从最开始的单订单系统+简单交易系统，到后面的单订单系统+多交易系统，再到后面的多订单</description>
-    </item>
     
     <item>
       <title>实验室之多线程： JIT 干扰</title>
