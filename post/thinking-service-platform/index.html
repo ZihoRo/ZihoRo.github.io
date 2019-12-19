@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>服务平台之业务分析与数据库结构 - Ziho Ro&#39;s Blog</title>
+  <title>服务平台之业务分析与结构设计 - Ziho Ro&#39;s Blog</title>
   <meta name="renderer" content="webkit" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -38,25 +38,25 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
-<meta property="og:title" content="服务平台之业务分析与数据库结构" />
+<meta property="og:title" content="服务平台之业务分析与结构设计" />
 <meta property="og:description" content="前言 毕业以来，一直在公司做企业服务相关的开发，公司的系统从最开始的单订单系统&#43;简单交易系统，到后面的单订单系统&#43;多交易系统，再到后面的多订单" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://zihoro.github.io/post/thinking-service-platform/" />
 <meta property="article:published_time" content="2019-12-18T21:56:48+08:00" />
 <meta property="article:modified_time" content="2019-12-18T21:56:48+08:00" />
-<meta itemprop="name" content="服务平台之业务分析与数据库结构">
+<meta itemprop="name" content="服务平台之业务分析与结构设计">
 <meta itemprop="description" content="前言 毕业以来，一直在公司做企业服务相关的开发，公司的系统从最开始的单订单系统&#43;简单交易系统，到后面的单订单系统&#43;多交易系统，再到后面的多订单">
 
 
 <meta itemprop="datePublished" content="2019-12-18T21:56:48&#43;08:00" />
 <meta itemprop="dateModified" content="2019-12-18T21:56:48&#43;08:00" />
-<meta itemprop="wordCount" content="2458">
+<meta itemprop="wordCount" content="2667">
 
 
 
 <meta itemprop="keywords" content="JAVA,思路," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="服务平台之业务分析与数据库结构"/>
+<meta name="twitter:title" content="服务平台之业务分析与结构设计"/>
 <meta name="twitter:description" content="前言 毕业以来，一直在公司做企业服务相关的开发，公司的系统从最开始的单订单系统&#43;简单交易系统，到后面的单订单系统&#43;多交易系统，再到后面的多订单"/>
 
 <!--[if lte IE 9]>
@@ -120,7 +120,7 @@
           <article class="post">
     
     <header class="post-header">
-      <h1 class="post-title">服务平台之业务分析与数据库结构</h1>
+      <h1 class="post-title">服务平台之业务分析与结构设计</h1>
 
       <div class="post-meta">
         <span class="post-time"> 2019-12-18 </span>
@@ -150,6 +150,9 @@
 <div class="sect1">
 <h2 id="_业务分析">业务分析</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>身为程序员，虽然敲代码是本职，但是更重要的是敲代码之前的思考。好的思路、好的结构设计可以让我们不用做到一半，发现实现不了，得推倒重来。而这些都需要深入理解业务，对业务进行分析，考虑其正向流程、逆向流程、异常流程，然后选择一个合适的整体结构。</p>
+</div>
 <div class="paragraph">
 <p>服务平台提供的核心功能是两个</p>
 </div>
@@ -203,15 +206,15 @@
 <div class="ulist">
 <ul>
 <li>
-<p>照搬 <code>一种简单服务</code> 的数据库结构：由于各个简单服务的属性不一致，就会存在多种订单结构，每一种订单结构都得有一套处理下单、支付、退款相关的逻辑，重复劳动过多</p>
+<p>照搬 <code>一种简单服务</code> 的结构：由于各个简单服务的属性不一致，就会存在多种订单结构，每一种订单结构都得有一套处理下单、支付、退款相关的逻辑，重复劳动过多</p>
 </li>
 <li>
-<p><code>通用订单</code> 和 <code>业务订单</code> 的数据库结构：将各业务系统的通用属性抽离到通用订单，业务系统自己特定的属性放到业务订单。使用通用订单属性做统一逻辑，比如下单流程、交易相关流程、统一订单列表等等，一个通用订单会对应一个业务订单。</p>
+<p><code>通用订单</code> 和 <code>业务订单</code> 分离的结构：将各业务系统的通用属性抽离到通用订单，业务系统自己特定的属性放到业务订单。使用通用订单属性做统一逻辑，比如下单流程、交易相关流程、统一订单列表等等，一个通用订单会对应一个业务订单。</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>基于以上分析，<code>多种简单服务</code> 的情况，选择第二种 <code>通用订单</code> 和 <code>业务订单</code> 的数据库结构。</strong></p>
+<p><strong>基于以上分析，<code>多种简单服务</code> 的情况，选择第二种 <code>通用订单</code> 和 <code>业务订单</code> 分离的结构。</strong></p>
 </div>
 <div class="paragraph">
 <p>如果需要提供的服务属于 <code>复合服务</code> ：</p>
@@ -219,15 +222,15 @@
 <div class="ulist">
 <ul>
 <li>
-<p>照搬 <code>多种简单服务</code> 的数据库结构：由于可以同时提供多种简单服务，而 <code>通用订单</code> 和 <code>业务订单</code> 的数据库结构是一对一，如果不作改变，我们无法区分哪些服务是同一批次提供的。</p>
+<p>照搬 <code>多种简单服务</code> 的结构：由于可以同时提供多种简单服务，而 <code>通用订单</code> 和 <code>业务订单</code> 的结构是一对一，如果不作改变，我们无法区分哪些服务是同一批次提供的。</p>
 </li>
 <li>
-<p>对 <code>多种简单服务</code> 的数据库结构作适应性改动：引入 <code>父子单</code> 的概念， <code>父单</code> 和 <code>子单</code> 是一对多的关系，所以子单存储父单的单号。同一批次提供的服务的第一个订单是没有父单的，称之为 <code>顶级订单</code> （也可以叫 <code>主单</code> 或者 <code>根订单</code>，看自己怎么理解），这个订单里记录这次提供的所有服务，然后根据需要将该订单拆分为多个简单服务的子单，并且将子订单的父单号存储为该订单的订单号，维持父子层级关系。如果业务再复杂一点， 子单可以有多个子单，也使用这个方式维持层级关系。层级多了之后，可能会导致查询比较麻烦，所以最好是在订单里能存储顶级订单号。我称作 <code>顶级订单</code>，是因为我是把订单的这种层级关系想象成一个金字塔，而最初的那个订单就在金字塔顶端。后续查询可以根据这个顶级订单号将这个金字塔里所有的订单都拉出来。</p>
+<p>对 <code>多种简单服务</code> 的结构作适应性改动：引入 <code>父子单</code> 的概念， <code>父单</code> 和 <code>子单</code> 是一对多的关系，所以子单存储父单的单号。同一批次提供的服务的第一个订单是没有父单的，称之为 <code>顶级订单</code> （也可以叫 <code>主单</code> 或者 <code>根订单</code>，看自己怎么理解），这个订单里记录这次提供的所有服务，然后根据需要将该订单拆分为多个简单服务的子单，并且将子订单的父单号存储为该订单的订单号，维持父子层级关系。如果业务再复杂一点， 子单可以有多个子单，也使用这个方式维持层级关系。层级多了之后，可能会导致查询比较麻烦，所以最好是在订单里能存储顶级订单号。我称作 <code>顶级订单</code>，是因为我是把订单的这种层级关系想象成一个金字塔，而最初的那个订单就在金字塔顶端。后续查询可以根据这个顶级订单号将这个金字塔里所有的订单都拉出来。</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>基于以上分析， <code>复合服务</code> 的情况，我们选择 <code>通用订单</code> 和 <code>业务订单</code> 的数据库结构外加 <code>父子单</code></strong></p>
+<p><strong>基于以上分析， <code>复合服务</code> 的情况，我们选择 <code>通用订单</code> 和 <code>业务订单</code> 分离外加 <code>父子单</code> 的结构</strong></p>
 </div>
 </div>
 </div>
@@ -259,7 +262,7 @@
 <p>复杂程度依次提高，通用性也依次提高。</p>
 </div>
 <div class="paragraph">
-<p>收取费用这个功能通俗点讲其实就是交易系统，用户通过在订单系统里下单之后，根据业务系统的业务属性是 <code>先付费</code> 还是 <code>后付费</code> 选择触发交易的时机。</p>
+<p>收取费用这个功能通俗点讲其实就是交易系统，用户通过在订单系统里下单之后，根据业务系统的业务属性是 <code>先付费</code> 还是 <code>后付费</code> 在合适的时机触发合适的交易（比如滴滴打车属于后付费业务，这样在下单时要触发冻结，订单取消要触发解冻，订单完成之后要触发支付等等）。</p>
 </div>
 <div class="paragraph">
 <p>如果需要提供的交易是 <code>一种简单交易</code></p>
@@ -267,10 +270,10 @@
 <div class="ulist">
 <ul>
 <li>
-<p>使用订单作为交易记录：这样会导致订单得存有交易相关属性，很多属性可能订单并不关心。交易状态的流转和订单状态的流转可能会产生冲突。</p>
+<p>订单与交易合一的结构：这样会导致订单得存有交易相关属性，很多属性可能订单并不关心。交易状态的流转和订单状态的流转可能会产生冲突。</p>
 </li>
 <li>
-<p>交易记录表（冻结表、支付表、退款表）：订单结构更纯粹，分工明确，职责单一。</p>
+<p>订单与交易分离的结构：订单结构更纯粹，分工明确，职责单一。</p>
 </li>
 </ul>
 </div>
@@ -283,15 +286,15 @@
 <div class="ulist">
 <ul>
 <li>
-<p>照搬 <code>一种简单交易</code> 的数据库结构：此时需要能区分交易记录具体属于哪种简单交易，否则在处理重复支付等相关地方会比较麻烦，退款和支付的对应关系会比较混乱。如果订单允许多次支付，这种数据库结构不能很好的区分正常支付和重复支付（比如第一次支付，使用手机 A 唤起支付宝，使用手机 B 唤起微信，让手机 B 支付成功，手机 A 停留在输入密码的页面（支付宝 APP 支付唤起密码页内部实际没有生成支付记录，无法通过服务端 API 关闭支付）。然后开启第二次支付操作，使用手机 C 唤起支付宝，使用手机 D 唤起微信，然后先将手机 A 支付成功，再将手机 D 支付成功，最后将手机 C 支付成功。此时判断重复支付会产生混乱。</p>
+<p>照搬 <code>一种简单交易</code> 的结构：此时需要能区分交易记录具体属于哪种简单交易，否则在处理重复支付等相关地方会比较麻烦，退款和支付的对应关系会比较混乱。如果订单允许多次支付，这种结构不能很好的区分正常支付和重复支付（比如第一次支付，使用手机 A 唤起支付宝，使用手机 B 唤起微信，让手机 B 支付成功，手机 A 停留在输入密码的页面（支付宝 APP 支付唤起密码页内部实际没有生成支付记录，无法通过服务端 API 关闭支付）。然后开启第二次支付操作，使用手机 C 唤起支付宝，使用手机 D 唤起微信，然后先将手机 A 支付成功，再将手机 D 支付成功，最后将手机 C 支付成功。此时判断重复支付会产生混乱。</p>
 </li>
 <li>
-<p>使用 <code>交易组</code> 和 <code>交易详情</code> 的数据库结构：交易组是记录某次交易操作，交易详情记录在此次交易操作期间产生的多次简单交易（比如切换支付工具，支付组不变，支付组对应的支付详情会新增一条）。交易组和交易详情是一对多的关系，有一条交易详情成功则将交易组流转到成功。只要交易组的状态不是进行中，则触发逆向流程。因为出现这种情况只能是重复操作，需要将操作回退。多次支付可以完美判断重复支付了。</p>
+<p>使用 <code>交易组</code> 和 <code>交易详情</code> 的结构：交易组是记录某次交易操作，交易详情记录在此次交易操作期间产生的多次简单交易（比如切换支付工具，支付组不变，支付组对应的支付详情会新增一条）。交易组和交易详情是一对多的关系，有一条交易详情成功则将交易组流转到成功。只要交易组的状态不是进行中，则触发逆向流程。因为出现这种情况只能是重复操作，需要将操作回退。这种结构在前面的例子中，手机 A 的支付会判定为重复支付，因为手机 A 和手机 B 属于同一个支付组，手机 B 支付成功之后会将支付组流转到成功，手机 A 支付成功时能得知支付组已经不是支付中状态，所以就可以完美判断重复支付了。</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>基于以上分析，<code>多种简单交易</code> 的情况，如果订单只会支付一次，则使用单交易记录表的数据库结构即可。如果订单可能支付多次，则支付使用支付组和支付详情的数据库结构，冻结和退款可以使用单纪录表的数据库结构。</strong></p>
+<p><strong>基于以上分析，<code>多种简单交易</code> 的情况，如果订单只会支付一次，则使用单交易的结构即可。如果订单可能支付多次，则支付使用支付组和支付详情的结构，冻结和退款可以使用单交易的结构。</strong></p>
 </div>
 <div class="paragraph">
 <p>如果需要提供的交易是 <code>复合交易</code></p>
@@ -299,15 +302,15 @@
 <div class="ulist">
 <ul>
 <li>
-<p>照搬 <code>多种简单交易</code> 的第一种数据库结构：由于多种简单交易可以同时提供，所以一次交易可能会有多条合法的交易记录。由于记录的分散，重复支付的判断会比较混乱。</p>
+<p>照搬 <code>多种简单交易</code> 的第一种结构：由于多种简单交易可以同时提供，所以一次交易可能会有多条合法的交易记录。由于记录的分散，重复支付的判断会比较混乱。</p>
 </li>
 <li>
-<p>照搬 <code>多种简单交易</code> 的第二种数据库结构：由于有组的概念，只需要在最后交易成功时对组进行操作即可。多种简单交易同时提供，相当于在交易详情有多条记录，可以直接支撑。</p>
+<p>照搬 <code>多种简单交易</code> 的第二种结构：由于有组的概念，只需要在最后交易成功时对组进行操作即可。多种简单交易同时提供，相当于在交易详情有多条记录，可以直接支撑。</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>基于以上分析， <code>复合交易</code> 的情况，选择 <code>交易组</code> 和 <code>交易详情</code> 的数据库结构。</strong></p>
+<p><strong>基于以上分析， <code>复合交易</code> 的情况，选择 <code>交易组</code> 和 <code>交易详情</code> 的结构。</strong></p>
 </div>
 </div>
 </div>
@@ -340,7 +343,11 @@
           <a href="/tags/%E6%80%9D%E8%B7%AF/">思路</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/thinking-service-platform-technology-stack/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">服务平台之技术栈选择</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/laboratory-multithreading-and-jit/">
             <span class="next-text nav-default">实验之多线程： JIT 对共享变量读取的干扰</span>
             <span class="next-text nav-mobile">下一篇</span>
