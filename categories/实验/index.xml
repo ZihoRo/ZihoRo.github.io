@@ -13,19 +13,19 @@
     
     <item>
       <title>实验之多线程： JIT 对共享变量读取的干扰</title>
-      <link>https://zihoro.github.io/post/laboratory-multithreading-and-jit/</link>
+      <link>https://zihoro.github.io/post/laboratory/multithreading-and-jit/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
       
-      <guid>https://zihoro.github.io/post/laboratory-multithreading-and-jit/</guid>
+      <guid>https://zihoro.github.io/post/laboratory/multithreading-and-jit/</guid>
       <description>问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread</description>
     </item>
     
     <item>
       <title>实验之 GC Roots：线程以及线程池的垃圾回收</title>
-      <link>https://zihoro.github.io/post/laboratory-gc-roots-thread-pool/</link>
+      <link>https://zihoro.github.io/post/laboratory/gc-roots-thread-pool/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:41 +0800</pubDate>
       
-      <guid>https://zihoro.github.io/post/laboratory-gc-roots-thread-pool/</guid>
+      <guid>https://zihoro.github.io/post/laboratory/gc-roots-thread-pool/</guid>
       <description>问题一：当你创建一个线程池之后，往线程池扔一个任务之后，不持有该线程池，该线程池里的线程是否会被垃圾回收？ 测试代码 public class ThreadPoolGcTest { public static void main(String[] args) { int size =</description>
     </item>
     

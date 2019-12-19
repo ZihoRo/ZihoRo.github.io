@@ -6,26 +6,26 @@
     <description>Recent content in 思路 on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 19 Dec 2019 12:22:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 19 Dec 2019 22:22:00 +0800</lastBuildDate>
     
 	<atom:link href="https://zihoro.github.io/tags/%E6%80%9D%E8%B7%AF/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>服务平台之技术栈选择</title>
-      <link>https://zihoro.github.io/post/thinking-service-platform-technology-stack/</link>
-      <pubDate>Thu, 19 Dec 2019 12:22:00 +0800</pubDate>
+      <link>https://zihoro.github.io/post/service-platform/technology-stack/</link>
+      <pubDate>Thu, 19 Dec 2019 22:22:00 +0800</pubDate>
       
-      <guid>https://zihoro.github.io/post/thinking-service-platform-technology-stack/</guid>
+      <guid>https://zihoro.github.io/post/service-platform/technology-stack/</guid>
       <description>想清楚大概结构之后，就可以选取合适的技术栈了。因为合适的技术栈可以解决很多已知问题，减少代码的开发量。如果自己开发，没有经历过大量的使用场景</description>
     </item>
     
     <item>
       <title>服务平台之业务分析与结构设计</title>
-      <link>https://zihoro.github.io/post/thinking-service-platform/</link>
+      <link>https://zihoro.github.io/post/service-platform/analysis/</link>
       <pubDate>Wed, 18 Dec 2019 21:56:48 +0800</pubDate>
       
-      <guid>https://zihoro.github.io/post/thinking-service-platform/</guid>
+      <guid>https://zihoro.github.io/post/service-platform/analysis/</guid>
       <description>前言 毕业以来，一直在公司做企业服务相关的开发，公司的系统从最开始的单订单系统+简单交易系统，到后面的单订单系统+多交易系统，再到后面的多订单</description>
     </item>
     

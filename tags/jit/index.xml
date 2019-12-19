@@ -13,10 +13,10 @@
     
     <item>
       <title>实验之多线程： JIT 对共享变量读取的干扰</title>
-      <link>https://zihoro.github.io/post/laboratory-multithreading-and-jit/</link>
+      <link>https://zihoro.github.io/post/laboratory/multithreading-and-jit/</link>
       <pubDate>Tue, 17 Dec 2019 18:34:59 +0800</pubDate>
       
-      <guid>https://zihoro.github.io/post/laboratory-multithreading-and-jit/</guid>
+      <guid>https://zihoro.github.io/post/laboratory/multithreading-and-jit/</guid>
       <description>问题：多线程情况下，对非 volatile 的共享变量的改动，其他线程是否可见？ 第一轮测试 测试代码 public class MultiThreadJitTest { private static boolean flag = false; private static long num = 0; public static void main(String[] args) throws InterruptedException { long now = System.currentTimeMillis(); final Thread</description>
     </item>
     
