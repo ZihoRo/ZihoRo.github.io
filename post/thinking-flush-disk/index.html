@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>持久化策略大比拼 - Ziho Ro&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Ziho Ro" /><meta name="description" content="持久化策略要分单服务器和多服务器来讨论，单服务器无法保证磁盘损坏的情况下数据的完整性。 单服务器（性能依次降低，安全性依次提高） 应用同步写用户" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.59.1 with theme even" />
+
+
+<link rel="canonical" href="https://zihoro.github.io/post/thinking-flush-disk/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+<link href="/dist/even.c2a46f00.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="持久化策略大比拼" />
+<meta property="og:description" content="持久化策略要分单服务器和多服务器来讨论，单服务器无法保证磁盘损坏的情况下数据的完整性。 单服务器（性能依次降低，安全性依次提高） 应用同步写用户" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://zihoro.github.io/post/thinking-flush-disk/" />
+<meta property="article:published_time" content="2019-12-19T22:57:03+08:00" />
+<meta property="article:modified_time" content="2019-12-19T22:57:03+08:00" />
+<meta itemprop="name" content="持久化策略大比拼">
+<meta itemprop="description" content="持久化策略要分单服务器和多服务器来讨论，单服务器无法保证磁盘损坏的情况下数据的完整性。 单服务器（性能依次降低，安全性依次提高） 应用同步写用户">
+
+
+<meta itemprop="datePublished" content="2019-12-19T22:57:03&#43;08:00" />
+<meta itemprop="dateModified" content="2019-12-19T22:57:03&#43;08:00" />
+<meta itemprop="wordCount" content="2352">
+
+
+
+<meta itemprop="keywords" content="JAVA,思路," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="持久化策略大比拼"/>
+<meta name="twitter:description" content="持久化策略要分单服务器和多服务器来讨论，单服务器无法保证磁盘损坏的情况下数据的完整性。 单服务器（性能依次降低，安全性依次提高） 应用同步写用户"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Ziho Ro&#39;s Blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">主页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">类别</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Ziho Ro&#39;s Blog</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">主页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">类别</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">持久化策略大比拼</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-12-19 </span>
+        <div class="post-category">
+            <a href="/categories/java/"> JAVA </a>
+            <a href="/categories/%E6%80%9D%E8%B7%AF/"> 思路 </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    
+  </div>
+</div>
+    <div class="post-content">
+      <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>持久化策略要分单服务器和多服务器来讨论，单服务器无法保证磁盘损坏的情况下数据的完整性。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>单服务器（性能依次降低，安全性依次提高）</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>应用同步写用户内存，应用异步触发写系统缓存和磁盘（应用宕机可能丢失数据、服务器宕机可能丢失数据、磁盘损坏可能丢失数据）</p>
+</li>
+<li>
+<p>应用同步写系统缓存，操作系统或应用异步触发写磁盘（应用宕机不丢失数据、服务器宕机可能丢失数据、磁盘损坏可能丢失数据）</p>
+</li>
+<li>
+<p>应用同步写系统缓存，应用同步触发写磁盘（应用宕机不丢失数据、服务器宕机不丢失数据、磁盘损坏可能丢失数据）</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>多服务器</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>同步复制（只要主从任意有一台服务器数据不丢失，则数据不丢失）</p>
+</li>
+<li>
+<p>异步复制（只要主服务器可能丢失数据，从服务器就有可能丢失数据）</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_redis_持久化">Redis 持久化</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><code>AOF(Append Only File)</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>持久化格式：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>未瘦身：存储的是所有修改内存的指令。相当于记录了依次修改过程</p>
+</li>
+<li>
+<p>瘦身后：根据内存数据构造写指令。相当于记录了最终修改结果</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>持久化策略：</p>
+<div class="paragraph">
+<p><code>Redis</code> 不管什么策略，单机都会同步写系统缓存，所以如果只是 <code>Redis</code> 宕机是不会丢失数据的。<code>Redis</code> 总共有三种策略。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>永不执行，即不主动触发刷盘，依赖操作系统刷盘。应用宕机不丢失数据、服务器宕机可能丢失数据、磁盘损坏可能丢失数据。</p>
+</li>
+<li>
+<p>定时执行，即隔固定时间触发刷盘。应用宕机不丢失数据、服务器宕机可能丢失上次刷盘到宕机时间点的数据、磁盘损坏可能丢失数据。</p>
+</li>
+<li>
+<p>次次执行，即每条写指令都刷盘，速度会很慢，应用宕机不丢失数据、服务器宕机不丢失数据、磁盘损坏可能丢失数据。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>RDB</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>内存数据的二进制序列化</p>
+</li>
+<li>
+<p>持久化步骤：</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>fork</code> 进程，父子进程共享内存数据继续处理客户端指令，子进程处理数据持久化</p>
+</li>
+<li>
+<p>依赖操作系统的 <code>Copy on Write</code>，父进程写数据时会拷贝一份，只修改拷贝的那份数据，所以子进程看到的数据一直是 <code>fork</code> 那一刻的数据。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>主从复制策略都是异步复制</p>
+<div class="ulist">
+<ul>
+<li>
+<p>增量复制：主节点将修改性指令写到内存的 <code>Buffer</code> 里，异步将 <code>Buffer</code> 里的指令发送到从节点，从节点一边执行主节点发过来的指令，一边向主节点反馈同步的进度。</p>
+</li>
+<li>
+<p>快照复制：场景是从节点第一次复制或主从节点进度相差过大，超过了 <code>Buffer</code> 的限制。这样会导致主节点保存一次快照，然后将快照数据复制到从节点（可以不落盘直接复制），期间的增量指令写 <code>Buffer</code>。所以需要有合适的 <code>Buffer</code> 长度，避免快照复制死循环。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mysql_持久化">MySQL 持久化</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><code>binlog</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>层级：服务层</p>
+</li>
+<li>
+<p>逻辑日志：记录的修改逻辑。基于 SQL 语句的模式、基于行的模式、混合模式</p>
+</li>
+<li>
+<p>作用：增量备份、主备同步、数据恢复</p>
+</li>
+<li>
+<p>控制标志： <code>sync_binlog=n</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>n=0</code> 表示同步写系统缓存，操作系统触发写磁盘。应用宕机不丢失数据、服务器宕机可能丢失数据、磁盘损坏可能丢失数据。</p>
+</li>
+<li>
+<p><code>n&gt;0</code> 表示同步写系统缓存，每 <code>n</code> 组事务走到 <code>binlog</code> 刷盘的 <code>sync</code> 阶段则会触发刷磁盘。应用宕机不丢失数据、服务器宕机可能丢失 <code>n</code> 组事务数据、磁盘损坏可能丢失数据。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>刷盘步骤</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>flush</code> 阶段：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>事务提交时会追加到 <code>flush</code> 链表，如果是 <code>flush</code> 链表的第一个线程，则成为 <code>leader</code>，否则为 <code>follower</code>。</p>
+</li>
+<li>
+<p><code>leader</code> 获取 <code>log</code> 锁，清空 <code>flush</code> 链表。新事务提交还会源源不断追加到 <code>flush</code> 链表，但是新 <code>leader</code> 会阻塞在获取 <code>log</code> 锁这里。</p>
+</li>
+<li>
+<p><code>leader</code> 将链表的 <code>redolog</code> 执行 <code>prepare</code> 阶段。</p>
+</li>
+<li>
+<p><code>leader</code> 将链表的 <code>binlog</code> 写入系统缓存。</p>
+</li>
+<li>
+<p>通知 <code>dump</code> 线程 <code>dump binlog</code>（主备同步）。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>sync</code> 阶段：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>持有 <code>log</code> 锁的 <code>leader</code> 释放 <code>log</code> 锁，并追加到 <code>sync</code> 链表，如果是 <code>sync</code> 链表的第一个线程，则成为 <code>leader</code>，否则为 <code>follower</code>。<code>flush</code> 链表中等待 <code>log</code> 锁的 <code>leader</code> 可以获取 <code>log</code> 锁了。</p>
+</li>
+<li>
+<p>为了积累更多的数据执行一次刷盘，会等待一定数量或者时间。</p>
+</li>
+<li>
+<p><code>leader</code> 获取 <code>sync</code> 锁，清空 <code>sync</code> 链表。后续 <code>flush</code> 阶段过来的线程还会源源不断追加到 <code>sync</code> 链表，但是新 <code>leader</code> 会阻塞在获取 <code>sync</code> 锁这里。</p>
+</li>
+<li>
+<p><code>leader</code> 将链表的 <code>binlog</code> 触发写磁盘。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>commit</code> 阶段（<code>commit</code> 链表第一个线程为 <code>leader</code>，其余为 <code>follower</code>）：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>持有 <code>sync</code> 锁的 <code>leader</code> 释放 <code>sync</code> 锁，并追加到 <code>commit</code> 链表，如果是 <code>commit</code> 链表的第一个线程，则成为 <code>leader</code>，否则为 <code>follower</code>。<code>sync</code> 链表中等待 <code>sync</code> 锁的 <code>leader</code> 可以获取 <code>sync</code> 锁了。</p>
+</li>
+<li>
+<p><code>leader</code> 获取 <code>commit</code> 锁，清空 <code>commit</code> 链表。后续 <code>sync</code> 阶段过来的线程还会源源不断追加到 <code>commit</code> 链表，但是新 <code>leader</code> 会阻塞在获取 <code>commit</code> 锁这里。</p>
+</li>
+<li>
+<p><code>leader</code> 将链表的 <code>redolog</code> 一一执行 <code>commit</code> 阶段。</p>
+</li>
+<li>
+<p><code>leader</code> 释放 <code>commit</code> 锁。<code>commit</code> 链表中等待 <code>commit</code> 锁的 <code>leader</code> 可以获取 <code>commit</code> 锁了</p>
+</li>
+<li>
+<p><code>leader</code> 唤醒 <code>follower</code> 线程。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>redolog</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>层级：引擎层</p>
+</li>
+<li>
+<p>物理日志：记录被修改后值</p>
+</li>
+<li>
+<p>作用：数据库重启恢复事务，保证事务的持久性</p>
+</li>
+<li>
+<p>控制标志： <code>innodb_flush_log_at_trx_commit=n</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>n=0</code> 表示同步写用户内存，异步每秒触发写系统缓存和磁盘。应用宕机可能丢失一秒数据、服务器宕机可能丢失一秒数据、磁盘损坏可能丢失数据。</p>
+</li>
+<li>
+<p><code>n=1</code> 表示同步写系统缓存并触发写磁盘。应用宕机不丢失数据、服务器宕机不丢失数据、磁盘损坏可能丢失数据。</p>
+</li>
+<li>
+<p><code>n=2</code> 表示同步写系统缓存，异步每秒触发写磁盘。应用宕机不丢失数据、服务器宕机可能丢失一秒数据、磁盘损坏可能丢失数据。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>刷盘步骤</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>prepare</code> 阶段（包含在 <code>binlog</code> 的 <code>flush</code> 阶段里）：</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>leader</code> 计算 <code>flush</code> 链表里最大的 <code>LSN</code> 为 <code>maxLsn</code></p>
+</li>
+<li>
+<p><code>leader</code> 将内存里所有 <code>LSN</code> 小于 <code>maxLsn</code> 的 <code>redolog</code> 一次性刷盘。</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>commit</code> 阶段（包含在 <code>binlog</code> 的 <code>commit</code> 阶段里）：</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>leader</code> 将事务 <code>redolog</code> 的 <code>commit</code> 标志刷盘。</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>undolog</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>层级：引擎层</p>
+</li>
+<li>
+<p>逻辑日志：记录修改前的值</p>
+</li>
+<li>
+<p>作用：事务回滚以及 <code>MVCC</code>。保证事务的原子性。</p>
+</li>
+<li>
+<p>刷盘：</p>
+<div class="ulist">
+<ul>
+<li>
+<p>在事务里，记录第一次被修改时，会和修改一起写入 <code>redolog</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_rocketmq_持久化">RocketMQ 持久化</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>持久化</p>
+<div class="ulist">
+<ul>
+<li>
+<p>CommitLog</p>
+</li>
+<li>
+<p>ConsumeQueue</p>
+</li>
+<li>
+<p>IndexFile</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>CommitLog</p>
+<div class="ulist">
+<ul>
+<li>
+<p>同步刷盘</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>等待刷盘成功</strong>。应用宕机不丢失数据、服务器宕机不丢失数据、磁盘损坏可能丢失数据。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>写 mappedByteBuffer</p>
+</li>
+<li>
+<p>构造刷盘请求，加入写队列，唤醒刷盘线程，超时等待将 mappedByteBuffer 写磁盘完成</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>不等待刷盘成功</strong>。应用宕机不丢失数据、服务器宕机可能丢失数据、磁盘损坏可能丢失数据。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>写 mappedByteBuffer</p>
+</li>
+<li>
+<p>唤醒刷盘线程。（交换读写队列，将 mappedByteBuffer 写磁盘）</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>异步刷盘</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>开启内存池</strong>。应用宕机可能丢失数据、服务器宕机可能丢失数据、磁盘损坏可能丢失数据。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>MappedFile 先写 writeBuffer</p>
+</li>
+<li>
+<p>唤醒提交线程（如果 writeBuffer 待写页数达到最小限制，则将 writeBuffer 写入 fileChannel ，并唤醒刷盘线程写磁盘。否则合并到下次写 fileChannel）</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>不开启内存池</strong>。应用宕机不丢失数据、服务器宕机可能丢失数据、磁盘损坏可能丢失数据。</p>
+<div class="ulist">
+<ul>
+<li>
+<p>MappedFile 先写 mappedByteBuffer</p>
+</li>
+<li>
+<p>唤醒刷盘线程（如果 mappedByteBuffer 待写入磁盘页数达到最小限制，则将 mappedByteBuffer 写入磁盘，否则合并到下次写磁盘）</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>主从复制</p>
+<div class="ulist">
+<ul>
+<li>
+<p>同步复制</p>
+</li>
+<li>
+<p>异步复制</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><a href="http://mysql.taobao.org/monthly/">淘宝数据库内核月报</a></p>
+</div>
+<div class="paragraph">
+<p><a href="http://mysql.taobao.org/monthly/2015/01/01/">MySQL 淘宝 Group Commit 优化</a></p>
+</div>
+</div>
+</div>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">Ziho Ro</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2019-12-19
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/java/">JAVA</a>
+          <a href="/tags/%E6%80%9D%E8%B7%AF/">思路</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/service-platform/technology-stack/">
+            <span class="next-text nav-default">服务平台之技术栈选择</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+  <a href="https://zihoro.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Ziho Ro</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  <script src="/lib/highlight/highlight.pack.js?v=20171001"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/dist/even.26188efa.min.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -6,10 +6,19 @@
     <description>Recent content in Posts on Ziho Ro&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 19 Dec 2019 22:22:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 19 Dec 2019 22:57:03 +0800</lastBuildDate>
     
 	<atom:link href="https://zihoro.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>持久化策略大比拼</title>
+      <link>https://zihoro.github.io/post/thinking-flush-disk/</link>
+      <pubDate>Thu, 19 Dec 2019 22:57:03 +0800</pubDate>
+      
+      <guid>https://zihoro.github.io/post/thinking-flush-disk/</guid>
+      <description>持久化策略要分单服务器和多服务器来讨论，单服务器无法保证磁盘损坏的情况下数据的完整性。 单服务器（性能依次降低，安全性依次提高） 应用同步写用户</description>
+    </item>
     
     <item>
       <title>服务平台之技术栈选择</title>
