@@ -50,7 +50,7 @@
 
 <meta itemprop="datePublished" content="2019-12-19T22:57:03&#43;08:00" />
 <meta itemprop="dateModified" content="2019-12-19T22:57:03&#43;08:00" />
-<meta itemprop="wordCount" content="2352">
+<meta itemprop="wordCount" content="2436">
 
 
 
@@ -493,10 +493,10 @@
 <div class="ulist">
 <ul>
 <li>
-<p>写 mappedByteBuffer</p>
+<p><code>MappedFile</code> 写 <code>mappedByteBuffer</code></p>
 </li>
 <li>
-<p>构造刷盘请求，加入写队列，唤醒刷盘线程，超时等待将 mappedByteBuffer 写磁盘完成</p>
+<p>构造刷盘请求，加入写队列，唤醒刷盘线程，超时等待将 <code>mappedByteBuffer</code> 写磁盘完成</p>
 </li>
 </ul>
 </div>
@@ -506,10 +506,10 @@
 <div class="ulist">
 <ul>
 <li>
-<p>写 mappedByteBuffer</p>
+<p><code>MappedFile</code> 写 <code>mappedByteBuffer</code></p>
 </li>
 <li>
-<p>唤醒刷盘线程。（交换读写队列，将 mappedByteBuffer 写磁盘）</p>
+<p>唤醒刷盘线程。（交换读写队列，将 <code>mappedByteBuffer</code> 写磁盘）</p>
 </li>
 </ul>
 </div>
@@ -526,10 +526,10 @@
 <div class="ulist">
 <ul>
 <li>
-<p>MappedFile 先写 writeBuffer</p>
+<p><code>MappedFile</code> 先写 <code>writeBuffer</code>（写使用 <code>DirectByteBuffer</code>，读使用 <code>Page Cache</code>，降低锁竞争）</p>
 </li>
 <li>
-<p>唤醒提交线程（如果 writeBuffer 待写页数达到最小限制，则将 writeBuffer 写入 fileChannel ，并唤醒刷盘线程写磁盘。否则合并到下次写 fileChannel）</p>
+<p>唤醒提交线程（如果 <code>writeBuffer</code> 待写页数达到最小限制，则将 <code>writeBuffer</code> 写入 <code>fileChannel</code> ，并唤醒刷盘线程写磁盘。否则合并到下次写 <code>fileChannel</code>）</p>
 </li>
 </ul>
 </div>
@@ -539,10 +539,10 @@
 <div class="ulist">
 <ul>
 <li>
-<p>MappedFile 先写 mappedByteBuffer</p>
+<p><code>MappedFile</code> 先写 <code>mappedByteBuffer</code>（读写都是 <code>Page Cache</code>，锁竞争会比较高）</p>
 </li>
 <li>
-<p>唤醒刷盘线程（如果 mappedByteBuffer 待写入磁盘页数达到最小限制，则将 mappedByteBuffer 写入磁盘，否则合并到下次写磁盘）</p>
+<p>唤醒刷盘线程（如果 <code>mappedByteBuffer</code> 待写入磁盘页数达到最小限制，则将 <code>mappedByteBuffer</code> 写入磁盘，否则合并到下次写磁盘）</p>
 </li>
 </ul>
 </div>
